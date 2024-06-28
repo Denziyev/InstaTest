@@ -13,7 +13,8 @@ const useSearchUser = () => {
     try {
       const q = query(
         collection(firestore, "users"),
-        where("username", "==", username)
+        where("username", "==", username),
+        where("isAdmin", "==", false), // Exclude admin users
       );
       const querySnapshot = await getDocs(q);
       if (querySnapshot.empty)

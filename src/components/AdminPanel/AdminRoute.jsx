@@ -11,14 +11,19 @@ const AdminRoute = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const userDoc = await getDoc(doc(firestore, 'users', user.uid));
-        if (userDoc.exists() && userDoc.data().isAdmin) {
-          setLoading(false);
-        } else {
+        try {
+          const userDoc = await getDoc(doc(firestore, 'users', user.uid));
+          if (userDoc.exists() && userDoc.data().isAdmin) {
+            setLoading(false);
+          } else {
+            navigate('/');
+          }
+        } catch (error) {
+          console.error("Failed to verify admin status:", error);
           navigate('/');
         }
       } else {
-        navigate('/login');
+        navigate('/auth');
       }
     });
 
@@ -26,7 +31,7 @@ const AdminRoute = ({ children }) => {
   }, [navigate]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="spinner">Loading...</div>; // Add a spinner or any loading indicator
   }
 
   return children;

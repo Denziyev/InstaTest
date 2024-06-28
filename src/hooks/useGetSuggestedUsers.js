@@ -25,6 +25,7 @@ const useGetSuggestedUsers = () => {
         const q = query(
           usersRef,
           where("uid", "not-in", [authUser.uid, ...authUser.following]),
+          where("isAdmin", "==", false), // Exclude admin users
           orderBy("uid"),
           limit(3)
         );
@@ -35,7 +36,11 @@ const useGetSuggestedUsers = () => {
         });
         setSuggestedUsers(users);
       } catch (error) {
-        showToast("Error", error.message, "error");
+        if (error.code === 'failed-precondition') {
+          showToast("Error", "Firestore index not found. Please create the required index.", "error");
+        } else {
+          showToast("Error", error.message, "error");
+        }
       } finally {
         setIsLoading(false);
       }
