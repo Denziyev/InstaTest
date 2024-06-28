@@ -58,7 +58,7 @@ const useSignUpUserWithEmailAndPassword = () => {
           following: [],
           posts: [],
           createdAt: Date.now(),
-          isAdmin: true,
+          isAdmin: false,
         };
 
         await setDoc(doc(firestore, "users", newUser.uid), userDoc);
