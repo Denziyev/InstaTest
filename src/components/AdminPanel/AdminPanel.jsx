@@ -45,10 +45,19 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
-  ColorModeProvider,
+  ChakraProvider,
+  extendTheme,
   useColorMode,
 } from '@chakra-ui/react';
 import { SearchIcon, MoonIcon, SunIcon } from '@chakra-ui/icons';
+
+// Create a theme
+const theme = extendTheme({
+  config: {
+    initialColorMode: 'light',
+    useSystemColorMode: false,
+  },
+});
 
 const AdminPanel = () => {
   const [users, setUsers] = useState([]);
@@ -369,8 +378,18 @@ const AdminPanel = () => {
 const ThemeToggle = () => {
   const { colorMode, toggleColorMode } = useColorMode();
 
+  useEffect(() => {
+    const savedColorMode = localStorage.getItem('chakra-ui-color-mode');
+    if (savedColorMode && savedColorMode !== colorMode) {
+      toggleColorMode();
+    }
+  }, [colorMode, toggleColorMode]);
+
   return (
-    <Button onClick={toggleColorMode} ml={2}>
+    <Button onClick={() => {
+      toggleColorMode();
+      localStorage.setItem('chakra-ui-color-mode', colorMode === 'light' ? 'dark' : 'light');
+    }} ml={2}>
       {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
     </Button>
   );
@@ -434,9 +453,9 @@ const ToggleBlockButton = ({ user, toggleBlock }) => {
 
 const App = () => {
   return (
-    <ColorModeProvider>
+    <ChakraProvider theme={theme}>
       <AdminPanel />
-    </ColorModeProvider>
+    </ChakraProvider>
   );
 };
 
