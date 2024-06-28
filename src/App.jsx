@@ -17,17 +17,22 @@ function App() {
   const location = useLocation();
 
   useEffect(() => {
-    const checkAdminStatus = async () => {
+    const checkUserStatus = async () => {
       if (authUser) {
         const userDoc = await getDoc(doc(firestore, 'users', authUser.uid));
-        if (userDoc.exists() && userDoc.data().isAdmin) {
-          setIsAdmin(true);
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          if (userData.isBlocked) {
+            await auth.signOut();
+            return <Navigate to="/auth" />;
+          }
+          setIsAdmin(userData.isAdmin);
         } else {
           setIsAdmin(false);
         }
       }
     };
-    checkAdminStatus();
+    checkUserStatus();
   }, [authUser]);
 
   return (
